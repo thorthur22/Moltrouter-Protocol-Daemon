@@ -5,6 +5,7 @@ import typer
 from mrpd.commands.bridge_mcp import bridge_mcp
 from mrpd.commands.bridge_openapi import bridge_openapi
 from mrpd.commands.init_provider import init_provider
+from mrpd.commands.mrpify_openapi import mrpify_openapi
 from mrpd.commands.publish import publish
 from mrpd.commands.route import route
 from mrpd.commands.run import run
@@ -15,6 +16,9 @@ app = typer.Typer(add_completion=False)
 
 bridge_app = typer.Typer(help="Generate MRP provider wrappers (bridges)")
 app.add_typer(bridge_app, name="bridge")
+
+mrpify_app = typer.Typer(help="MRP-ify existing systems with a guided flow")
+app.add_typer(mrpify_app, name="mrpify")
 
 
 @app.command()
@@ -99,9 +103,10 @@ def bridge_openapi_cmd(
     out_dir: str = typer.Option("./mrp-openapi-bridge", "--out-dir", help="Output directory"),
     provider_id: str = typer.Option("service:openapi/bridge", "--provider-id", help="Provider sender id"),
     backend_base_url: str | None = typer.Option(None, "--backend-base-url", help="Override OpenAPI servers[0].url"),
+    capability_prefix: str | None = typer.Option(None, "--capability-prefix", help="Prefix for generated capabilities (e.g. svc_)"),
 ) -> None:
     """Generate an MRP provider wrapper from an OpenAPI spec."""
-    bridge_openapi(spec=spec, out_dir=out_dir, provider_id=provider_id, backend_base_url=backend_base_url)
+    bridge_openapi(spec=spec, out_dir=out_dir, provider_id=provider_id, backend_base_url=backend_base_url, capability_prefix=capability_prefix)
 
 
 @bridge_app.command(name="mcp")
@@ -112,6 +117,34 @@ def bridge_mcp_cmd(
 ) -> None:
     """Generate an MRP provider wrapper scaffold from an MCP tool list."""
     bridge_mcp(tools_json=tools_json, out_dir=out_dir, provider_id=provider_id)
+
+
+@mrpify_app.command(name="openapi")
+def mrpify_openapi_cmd(
+    spec: str = typer.Option(..., "--spec", help="Path to OpenAPI spec (json/yaml)"),
+    out_dir: str = typer.Option("./mrp-openapi-bridge", "--out-dir", help="Output directory"),
+    provider_id: str = typer.Option("service:openapi/bridge", "--provider-id", help="Provider sender id"),
+    backend_base_url: str | None = typer.Option(None, "--backend-base-url", help="Override OpenAPI servers[0].url"),
+    capability_prefix: str | None = typer.Option(None, "--capability-prefix", help="Prefix for generated capabilities (e.g. svc_)"),
+    public_base_url: str | None = typer.Option(None, "--public-base-url", help="Deployed public base URL, e.g. https://api.example.com"),
+    publish_now: bool = typer.Option(False, "--publish", help="Run mrpd publish for each generated manifest URL (requires public HTTPS)"),
+    yes: bool = typer.Option(False, "--yes", help="Skip confirmation prompts"),
+    registry: str | None = typer.Option(None, "--registry", help="Registry base URL (default: https://www.moltrouter.dev)"),
+    poll_seconds: float = typer.Option(5.0, "--poll-seconds", min=1.0, max=60.0),
+) -> None:
+    """Guided flow: OpenAPI -> MRP bridge -> (optional) publish commands."""
+    mrpify_openapi(
+        spec=spec,
+        out_dir=out_dir,
+        provider_id=provider_id,
+        backend_base_url=backend_base_url,
+        capability_prefix=capability_prefix,
+        public_base_url=public_base_url,
+        do_publish=publish_now,
+        yes=yes,
+        registry=registry,
+        poll_seconds=poll_seconds,
+    )
 
 
 if __name__ == "__main__":

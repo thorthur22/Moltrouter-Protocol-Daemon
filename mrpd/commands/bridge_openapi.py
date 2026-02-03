@@ -21,11 +21,12 @@ def bridge_openapi(
     out_dir: str,
     provider_id: str,
     backend_base_url: str | None,
+    capability_prefix: str | None = None,
 ) -> None:
     """Generate an MRP provider wrapper from an OpenAPI spec.
 
     v0 behavior:
-    - one MRP capability per OpenAPI operationId
+    - one MRP capability per OpenAPI operationId (optionally prefixed)
     - generates per-operation manifests served at /mrp/manifest/<operationId>
     - execute expects a json input containing optional {path_params, query, body, headers}
     """
@@ -55,11 +56,12 @@ def bridge_openapi(
             if not op_id or not isinstance(op_id, str):
                 continue
 
-            route_id = f"route:openapi/{op_id}@0.1"
+            cap = f"{capability_prefix}{op_id}" if capability_prefix else op_id
+            route_id = f"route:openapi/{cap}@0.1"
 
             manifest = {
-                "capability_id": f"capability:openapi/{op_id}",
-                "capability": op_id,
+                "capability_id": f"capability:openapi/{cap}",
+                "capability": cap,
                 "version": "0.1",
                 "tags": ["mrp", "openapi"],
                 "inputs": [{"type": "json"}],
@@ -75,15 +77,16 @@ def bridge_openapi(
                         "method": method.upper(),
                         "path": pth,
                         "operationId": op_id,
+                        "capability": cap,
                         "base_url": base_url,
                         "route_id": route_id,
                     }
                 },
             }
 
-            (out / "mrp_manifests" / f"{op_id}.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+            (out / "mrp_manifests" / f"{cap}.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
 
-            operations.append({"operationId": op_id, "method": method.upper(), "path": pth, "route_id": route_id})
+            operations.append({"operationId": op_id, "capability": cap, "method": method.upper(), "path": pth, "route_id": route_id})
 
     if not operations:
         raise typer.Exit(code=2)
@@ -107,18 +110,18 @@ BACKEND_BASE_URL = ("''' + base_url + '''").rstrip("/")
 app = FastAPI(title="MRP OpenAPI Bridge")
 
 
-def _load_manifest(op_id: str) -> dict:
-    fp = MANIFEST_DIR / f"{op_id}.json"
+def _load_manifest(capability: str) -> dict:
+    fp = MANIFEST_DIR / f"{capability}.json"
     return json.loads(fp.read_text(encoding="utf-8"))
 
 
-def _operation_from_route_id(route_id: str) -> str:
-    # route:openapi/<operationId>@0.1
+def _capability_from_route_id(route_id: str) -> str:
+    # route:openapi/<capability>@0.1
     if not route_id.startswith("route:openapi/"):
         raise ValueError("invalid route_id")
     rest = route_id[len("route:openapi/"):]
-    op_id = rest.split("@", 1)[0]
-    return op_id
+    cap = rest.split("@", 1)[0]
+    return cap
 
 
 @app.get("/.well-known/mrp.json")
@@ -192,9 +195,9 @@ def mrp_execute(envelope: dict) -> dict:
 
     payload = envelope.get("payload") or {}
     route_id = payload.get("route_id")
-    op_id = _operation_from_route_id(route_id)
+    capability = _capability_from_route_id(route_id)
 
-    m = _load_manifest(op_id)
+    m = _load_manifest(capability)
     meta = (m.get("metadata") or {}).get("openapi") or {}
 
     method = meta.get("method")
