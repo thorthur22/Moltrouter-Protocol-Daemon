@@ -7,9 +7,15 @@ One installable package that can:
 - **validate** MRP envelopes against schemas/fixtures (`mrpd validate`) (WIP)
 
 ## Status
-Scaffold + minimal HTTP server endpoints are in place. Next step is to wire in the canonical schemas/fixtures from `moltrouter` and implement:
-- schema validation
-- registry query + offer scoring
+Minimal server + validation are working.
+
+Implemented:
+- Bundled canonical JSON Schemas + fixtures
+- `mrpd validate` (including `--fixtures`)
+- Basic registry discovery (`mrpd route`) (v0: query + rank + fetch manifests)
+
+Planned next:
+- negotiate/execute
 - MCP bridge adapter
 
 ## Dev

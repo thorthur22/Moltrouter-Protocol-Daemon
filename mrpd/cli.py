@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import typer
 
+from mrpd.commands.route import route
 from mrpd.commands.serve import serve
 from mrpd.commands.validate import validate
 
@@ -31,6 +32,19 @@ def validate_cmd(
 ) -> None:
     """Validate an MRP envelope against the bundled JSON Schemas."""
     validate(path, fixtures=fixtures)
+
+
+@app.command(name="route")
+def route_cmd(
+    intent: str = typer.Argument(..., help="High-level intent (human text)"),
+    capability: str | None = typer.Option(None, "--capability", help="Capability filter"),
+    policy: str | None = typer.Option(None, "--policy", help="Policy filter"),
+    registry: str | None = typer.Option(None, "--registry", help="Registry base URL (default: https://www.moltrouter.dev)"),
+    bootstrap_raw: str | None = typer.Option(None, "--bootstrap-raw", help="Override fallback raw registry JSON (URL or file://path)"),
+    limit: int = typer.Option(10, "--limit", min=1, max=50),
+) -> None:
+    """Query registry + rank candidates for an intent."""
+    route(intent=intent, capability=capability, policy=policy, registry=registry, limit=limit, bootstrap_raw=bootstrap_raw)
 
 
 if __name__ == "__main__":
