@@ -58,18 +58,23 @@ mrpd validate --path path/to/envelope.json
 `mrpd route` queries a registry and prints ranked candidates. **Registry entries must include `manifest_url`.**
 
 Defaults:
-- Registry base URL: `https://www.moltrouter.dev` (not live yet)
-- Fallback raw registry list: `https://raw.githubusercontent.com/thorthur22/moltrouter-registry/main/data/registry.json`
+- Registry base URL: `https://www.moltrouter.dev`
+- No raw bootstrap fallback is used unless explicitly configured (see below).
 
 Examples:
 ```bash
 mrpd route "inspect router capability" --capability router --policy no_pii --limit 5
 ```
 
-Local dev (override fallback raw list from a local checkout):
+Optional bootstrap (mostly for offline/dev):
+
+- Env var: `MRP_BOOTSTRAP_REGISTRY_RAW` (supports `file://...`)
+- Or CLI: `mrpd route ... --bootstrap-raw file:///C:/path/to/registry.json`
+
+Example:
 ```bash
 mrpd route "inspect router capability" --capability router --policy no_pii \
-  --bootstrap-raw "file:///C:/Users/thort/Documents/moltrouter-registry/data/registry.json"
+  --bootstrap-raw "file:///C:/path/to/registry.json"
 ```
 
 ## Endpoints (initial)
