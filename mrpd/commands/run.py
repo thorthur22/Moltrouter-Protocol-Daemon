@@ -22,7 +22,7 @@ def run(
     max_tokens: int | None,
     max_cost: float | None,
 ) -> None:
-    """End-to-end demo: query registry → discover → execute → print evidence.
+    """End-to-end demo: query registry -> discover -> execute -> print evidence.
 
     v0: expects provider implements /mrp/discover and /mrp/execute per manifest endpoints.
     """

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import typer
 
+from mrpd.commands.publish import publish
 from mrpd.commands.route import route
 from mrpd.commands.run import run
 from mrpd.commands.serve import serve
@@ -61,6 +62,16 @@ def run_cmd(
 ) -> None:
     """End-to-end: DISCOVER→EXECUTE against the best matching provider."""
     run(intent=intent, url=url, capability=capability, policy=policy, registry=registry, manifest_url=manifest_url, max_tokens=max_tokens, max_cost=max_cost)
+
+
+@app.command(name="publish")
+def publish_cmd(
+    manifest_url: str = typer.Option(..., "--manifest-url", help="Provider manifest URL to self-register"),
+    registry: str | None = typer.Option(None, "--registry", help="Registry base URL (default: https://www.moltrouter.dev)"),
+    poll_seconds: float = typer.Option(5.0, "--poll-seconds", min=1.0, max=60.0),
+) -> None:
+    """Self-register a provider in the public registry using HTTP-01 challenge."""
+    publish(manifest_url=manifest_url, registry=registry, poll_seconds=poll_seconds)
 
 
 if __name__ == "__main__":
