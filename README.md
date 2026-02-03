@@ -2,9 +2,9 @@
 
 One installable package that can:
 - **serve** MRP endpoints for local tools (`mrpd serve`)
-- **route** intents as a client (`mrpd route ...`) (WIP)
-- **bridge** other tool ecosystems (MCP/REST) into MRP (`mrpd bridge ...`) (WIP)
-- **validate** MRP envelopes against schemas/fixtures (`mrpd validate`) (WIP)
+- **route** intents as a client (`mrpd route ...`) (v0: registry query + ranking)
+- **bridge** other tool ecosystems (MCP/REST) into MRP (`mrpd bridge ...`) (planned)
+- **validate** MRP envelopes against schemas/fixtures (`mrpd validate`) (working)
 
 ## Status
 Minimal server + validation are working.
@@ -12,7 +12,7 @@ Minimal server + validation are working.
 Implemented:
 - Bundled canonical JSON Schemas + fixtures
 - `mrpd validate` (including `--fixtures`)
-- Basic registry discovery (`mrpd route`) (v0: query + rank + fetch manifests)
+- `mrpd route` (v0: query + rank + fetch manifests)
 
 Planned next:
 - negotiate/execute
@@ -25,6 +25,35 @@ python -m venv .venv
 pip install -e .
 
 mrpd serve --reload
+```
+
+## Validate
+Run the bundled conformance fixtures:
+```bash
+mrpd validate --fixtures
+```
+
+Validate a single envelope JSON file:
+```bash
+mrpd validate --path path/to/envelope.json
+```
+
+## Route (v0)
+`mrpd route` queries a registry and prints ranked candidates. **Registry entries must include `manifest_url`.**
+
+Defaults:
+- Registry base URL: `https://www.moltrouter.dev` (not live yet)
+- Fallback raw registry list: `https://raw.githubusercontent.com/thorthur22/moltrouter-registry/main/data/registry.json`
+
+Examples:
+```bash
+mrpd route "inspect router capability" --capability router --policy no_pii --limit 5
+```
+
+Local dev (override fallback raw list from a local checkout):
+```bash
+mrpd route "inspect router capability" --capability router --policy no_pii \
+  --bootstrap-raw "file:///C:/Users/thort/Documents/moltrouter-registry/data/registry.json"
 ```
 
 ## Endpoints (initial)
