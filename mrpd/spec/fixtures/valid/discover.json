@@ -1,0 +1,13 @@
+{
+  "mrp_version": "0.1",
+  "msg_id": "00000000-0000-0000-0000-000000000001",
+  "msg_type": "DISCOVER",
+  "timestamp": "2025-01-01T00:00:00Z",
+  "sender": {"id": "agent:moltbots/alpha"},
+  "payload": {
+    "intent": "extract pricing from vendor docs",
+    "inputs": [{"type": "url", "value": "https://example.com/pricing"}],
+    "constraints": {"max_cost": 0.05, "policy": ["no_pii"]},
+    "proofs_required": ["attestation"]
+  }
+}

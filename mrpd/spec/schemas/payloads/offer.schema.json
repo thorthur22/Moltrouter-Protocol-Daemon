@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://moltrouter.dev/schemas/mrp/0.1/payloads/offer.schema.json",
+  "title": "MRP OFFER Payload",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["offers"],
+  "properties": {
+    "offers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["route_id", "capability"],
+        "properties": {
+          "route_id": {"type": "string"},
+          "capability": {"type": "string"},
+          "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+          "cost": {"type": "object"},
+          "latency": {"type": "object"},
+          "proofs": {"type": "array", "items": {"type": "string"}},
+          "policy": {"type": "array", "items": {"type": "string"}},
+          "risk": {"type": "object"},
+          "endpoint": {"type": "string"}
+        }
+      }
+    },
+    "page": {"type": "object"}
+  }
+}

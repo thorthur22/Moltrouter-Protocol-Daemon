@@ -1,0 +1,1 @@
+recursive-include mrpd/spec *.json *.md

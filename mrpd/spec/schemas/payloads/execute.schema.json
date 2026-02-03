@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://moltrouter.dev/schemas/mrp/0.1/payloads/execute.schema.json",
+  "title": "MRP EXECUTE Payload",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["route_id"],
+  "properties": {
+    "route_id": {"type": "string"},
+    "inputs": {"type": "array", "items": {"$ref": "../types/input.schema.json"}},
+    "output_format": {"type": "string"},
+    "job": {"type": "object"}
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://moltrouter.dev/schemas/mrp/0.1/types/input.schema.json",
+  "title": "MRP Input Item",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["type"],
+  "properties": {
+    "type": {"type": "string"},
+    "value": {},
+    "uri": {"type": "string"},
+    "hash": {"type": "string"},
+    "size": {"type": "integer"},
+    "mime": {"type": "string"}
+  },
+  "oneOf": [
+    {"required": ["type", "value"], "properties": {"type": {"enum": ["text", "url", "json", "markdown"]}}},
+    {"$ref": "./artifact.schema.json"}
+  ]
+}

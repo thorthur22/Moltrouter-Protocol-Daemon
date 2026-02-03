@@ -1,0 +1,7 @@
+{
+  "mrp_version": "0.1",
+  "msg_type": "DISCOVER",
+  "timestamp": "2025-01-01T00:00:00Z",
+  "sender": {"id": "agent:moltbots/alpha"},
+  "payload": {"intent": "x"}
+}

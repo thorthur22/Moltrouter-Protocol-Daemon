@@ -1,0 +1,20 @@
+{
+  "mrp_version": "0.1",
+  "msg_id": "00000000-0000-0000-0000-000000000002",
+  "msg_type": "OFFER",
+  "timestamp": "2025-01-01T00:00:01Z",
+  "sender": {"id": "service:clawdbots/summarize"},
+  "receiver": {"id": "agent:moltbots/alpha"},
+  "payload": {
+    "offers": [
+      {
+        "route_id": "route-123",
+        "capability": "summarize",
+        "confidence": 0.9,
+        "policy": ["no_pii"],
+        "risk": {"data_retention_days": 0, "training_use": "none", "subprocessors": []},
+        "endpoint": "/mrp/negotiate"
+      }
+    ]
+  }
+}

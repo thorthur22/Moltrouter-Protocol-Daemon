@@ -1,0 +1,13 @@
+{
+  "mrp_version": "0.1",
+  "msg_id": "00000000-0000-0000-0000-000000000003",
+  "msg_type": "ERROR",
+  "timestamp": "2025-01-01T00:00:02Z",
+  "sender": {"id": "service:clawdbots/summarize"},
+  "payload": {
+    "code": "MRP_RATE_LIMITED",
+    "message": "Rate limit exceeded",
+    "retryable": true,
+    "retry_after_ms": 5000
+  }
+}

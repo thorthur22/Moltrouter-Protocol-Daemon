@@ -25,3 +25,4 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 packages = ["mrpd"]
+include-package-data = true

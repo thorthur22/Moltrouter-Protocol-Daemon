@@ -1,0 +1,8 @@
+{
+  "mrp_version": "0.1",
+  "msg_id": "00000000-0000-0000-0000-000000000004",
+  "msg_type": "NOT_A_REAL_TYPE",
+  "timestamp": "2025-01-01T00:00:00Z",
+  "sender": {"id": "agent:moltbots/alpha"},
+  "payload": {}
+}

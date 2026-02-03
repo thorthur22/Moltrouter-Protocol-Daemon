@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://moltrouter.dev/schemas/mrp/0.1/envelope.schema.json",
+  "title": "MRP Envelope (0.1)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["mrp_version", "msg_id", "msg_type", "timestamp", "sender", "payload"],
+  "properties": {
+    "mrp_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+$"},
+    "msg_id": {"type": "string", "minLength": 8},
+    "msg_type": {
+      "type": "string",
+      "enum": [
+        "HELLO",
+        "DISCOVER",
+        "OFFER",
+        "NEGOTIATE",
+        "EXECUTE",
+        "EVIDENCE",
+        "JOB_ACCEPTED",
+        "JOB_STATUS",
+        "STREAM_CHUNK",
+        "ERROR"
+      ]
+    },
+    "timestamp": {"type": "string", "format": "date-time"},
+    "sender": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {
+        "id": {"type": "string", "minLength": 3},
+        "proofs": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "receiver": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": {"id": {"type": "string", "minLength": 3}}
+    },
+    "trace": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "root": {"type": "string"},
+        "parent": {"type": "string"}
+      }
+    },
+    "auth": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "type": {"type": "string", "enum": ["bearer", "mTLS", "signed"]},
+        "token": {"type": "string"},
+        "scopes": {"type": "array", "items": {"type": "string"}},
+        "issuer": {"type": "string"},
+        "signature": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["alg", "key_id", "value"],
+          "properties": {
+            "alg": {"type": "string"},
+            "key_id": {"type": "string"},
+            "value": {"type": "string"}
+          }
+        }
+      }
+    },
+    "nonce": {"type": "string"},
+    "expires_at": {"type": "string", "format": "date-time"},
+    "idempotency_key": {"type": "string"},
+    "payload": {"type": "object"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"msg_type": {"const": "DISCOVER"}}},
+      "then": {"properties": {"payload": {"$ref": "./payloads/discover.schema.json"}}}
+    },
+    {
+      "if": {"properties": {"msg_type": {"const": "OFFER"}}},
+      "then": {"properties": {"payload": {"$ref": "./payloads/offer.schema.json"}}}
+    },
+    {
+      "if": {"properties": {"msg_type": {"const": "NEGOTIATE"}}},
+      "then": {"properties": {"payload": {"$ref": "./payloads/negotiate.schema.json"}}}
+    },
+    {
+      "if": {"properties": {"msg_type": {"const": "EXECUTE"}}},
+      "then": {"properties": {"payload": {"$ref": "./payloads/execute.schema.json"}}}
+    },
+    {
+      "if": {"properties": {"msg_type": {"const": "EVIDENCE"}}},
+      "then": {"properties": {"payload": {"$ref": "./payloads/evidence.schema.json"}}}
+    },
+    {
+      "if": {"properties": {"msg_type": {"const": "ERROR"}}},
+      "then": {"properties": {"payload": {"$ref": "./payloads/error.schema.json"}}}
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://moltrouter.dev/schemas/mrp/0.1/payloads/evidence.schema.json",
+  "title": "MRP EVIDENCE Payload",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["route_id"],
+  "properties": {
+    "route_id": {"type": "string"},
+    "job_id": {"type": "string"},
+    "outputs": {"type": "array", "items": {"$ref": "../types/input.schema.json"}},
+    "provenance": {"type": "object"},
+    "attestations": {"type": "array", "items": {"type": "string"}},
+    "usage": {"type": "object"},
+    "settlement": {"type": "object"}
+  }
+}

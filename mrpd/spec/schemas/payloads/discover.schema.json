@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://moltrouter.dev/schemas/mrp/0.1/payloads/discover.schema.json",
+  "title": "MRP DISCOVER Payload",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["intent"],
+  "properties": {
+    "intent": {"type": "string", "minLength": 1},
+    "inputs": {"type": "array", "items": {"$ref": "../types/input.schema.json"}},
+    "constraints": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "max_cost": {"type": "number", "minimum": 0},
+        "max_latency_ms": {"type": "integer", "minimum": 0},
+        "data_residency": {"type": "string"},
+        "policy": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "proofs_required": {"type": "array", "items": {"type": "string"}}
+  }
+}

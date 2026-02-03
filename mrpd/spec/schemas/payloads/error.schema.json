@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://moltrouter.dev/schemas/mrp/0.1/payloads/error.schema.json",
+  "title": "MRP ERROR Payload",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["code", "message", "retryable"],
+  "properties": {
+    "code": {"type": "string", "pattern": "^MRP_[A-Z0-9_]+$"},
+    "message": {"type": "string"},
+    "retryable": {"type": "boolean"},
+    "retry_after_ms": {"type": "integer", "minimum": 0},
+    "details": {"type": "object"}
+  }
+}
