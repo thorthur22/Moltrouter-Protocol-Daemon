@@ -1,0 +1,81 @@
+Metadata-Version: 2.4
+Name: mrpd
+Version: 0.1.0
+Summary: Moltrouter Protocol Daemon: serve, route, bridge, validate
+Author: Thor
+License: MIT
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: fastapi>=0.110
+Requires-Dist: uvicorn[standard]>=0.27
+Requires-Dist: pydantic>=2.6
+Requires-Dist: httpx>=0.27
+Requires-Dist: typer>=0.12
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: jsonschema>=4.21
+
+# mrpd — Moltrouter Protocol Daemon
+
+One installable package that can:
+- **serve** MRP endpoints for local tools (`mrpd serve`)
+- **route** intents as a client (`mrpd route ...`) (v0: registry query + ranking)
+- **bridge** other tool ecosystems (MCP/REST) into MRP (`mrpd bridge ...`) (planned)
+- **validate** MRP envelopes against schemas/fixtures (`mrpd validate`) (working)
+
+## Status
+Minimal server + validation are working.
+
+Implemented:
+- Bundled canonical JSON Schemas + fixtures
+- `mrpd validate` (including `--fixtures`)
+- `mrpd route` (v0: query + rank + fetch manifests)
+
+Planned next:
+- negotiate/execute
+- MCP bridge adapter
+
+## Dev
+```bash
+python -m venv .venv
+. .venv/bin/activate  # (Windows PowerShell: .\.venv\Scripts\Activate.ps1)
+pip install -e .
+
+mrpd serve --reload
+```
+
+## Validate
+Run the bundled conformance fixtures:
+```bash
+mrpd validate --fixtures
+```
+
+Validate a single envelope JSON file:
+```bash
+mrpd validate --path path/to/envelope.json
+```
+
+## Route (v0)
+`mrpd route` queries a registry and prints ranked candidates. **Registry entries must include `manifest_url`.**
+
+Defaults:
+- Registry base URL: `https://www.moltrouter.dev` (not live yet)
+- Fallback raw registry list: `https://raw.githubusercontent.com/thorthur22/moltrouter-registry/main/data/registry.json`
+
+Examples:
+```bash
+mrpd route "inspect router capability" --capability router --policy no_pii --limit 5
+```
+
+Local dev (override fallback raw list from a local checkout):
+```bash
+mrpd route "inspect router capability" --capability router --policy no_pii \
+  --bootstrap-raw "file:///C:/Users/thort/Documents/moltrouter-registry/data/registry.json"
+```
+
+## Endpoints (initial)
+- `GET /.well-known/mrp.json`
+- `GET /mrp/manifest`
+- `POST /mrp/hello`
+- `POST /mrp/discover`
+- `POST /mrp/negotiate`
+- `POST /mrp/execute`
