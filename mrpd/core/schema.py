@@ -41,6 +41,11 @@ def validate_envelope(envelope: dict[str, Any]) -> None:
         if marker in uri:
             rel = uri.split(marker, 1)[1]
             return _load_by_rel(rel)
+        # Back-compat for older ids that used moltrouter.dev without the /schemas/mrp/0.1 prefix
+        uri2 = uri.replace("https://moltrouter.dev/", "https://www.moltrouter.dev/")
+        if marker in uri2:
+            rel = uri2.split(marker, 1)[1]
+            return _load_by_rel(rel)
         # Fallback: try to treat the URL path as a relative file
         # e.g. https://example/x/y.json -> y.json
         rel = uri.rsplit("/", 1)[-1]

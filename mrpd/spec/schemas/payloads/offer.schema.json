@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://moltrouter.dev/schemas/mrp/0.1/payloads/offer.schema.json",
+  "$id": "https://www.moltrouter.dev/schemas/mrp/0.1/payloads/offer.schema.json",
   "title": "MRP OFFER Payload",
   "type": "object",
   "additionalProperties": false,

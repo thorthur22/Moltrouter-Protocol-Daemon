@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://moltrouter.dev/schemas/mrp/0.1/manifest.schema.json",
+  "$id": "https://www.moltrouter.dev/schemas/mrp/0.1/manifest.schema.json",
   "title": "MRP Capability Manifest (0.1)",
   "type": "object",
   "additionalProperties": false,
