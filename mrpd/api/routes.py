@@ -9,20 +9,30 @@ router = APIRouter()
 
 
 def response_envelope(envelope: dict, *, msg_type: str, payload: dict) -> dict:
+    """Build a response envelope.
+
+    IMPORTANT: response message ids must be new, and in_reply_to must reference
+    the triggering request msg_id.
+    """
+
+    from mrpd.core.util import utc_now_rfc3339
+    import uuid
+
     sender_id = (envelope.get("sender") or {}).get("id")
-    msg_id = envelope.get("msg_id")
+    req_msg_id = envelope.get("msg_id")
+
     resp = {
         "mrp_version": envelope.get("mrp_version", "0.1"),
-        "msg_id": msg_id,
+        "msg_id": str(uuid.uuid4()),
         "msg_type": msg_type,
-        "timestamp": envelope.get("timestamp"),
+        "timestamp": utc_now_rfc3339(),
         "sender": {"id": "service:mrpd"},
         "payload": payload,
     }
     if sender_id:
         resp["receiver"] = {"id": sender_id}
-    if msg_id:
-        resp["in_reply_to"] = msg_id
+    if req_msg_id:
+        resp["in_reply_to"] = req_msg_id
     return resp
 
 

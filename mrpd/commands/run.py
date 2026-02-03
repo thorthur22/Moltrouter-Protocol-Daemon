@@ -37,6 +37,8 @@ def run(
             typer.echo("Fetching manifest...")
             manifest = await fetch_manifest(manifest_url)
             manifest = normalize_manifest_endpoints(manifest, manifest_url)
+            # For the built-in demo provider, use a stable receiver id.
+            receiver_id = "service:mrpd"
         else:
             client = RegistryClient(base_url=registry) if registry else RegistryClient(base_url=MRP_DEFAULT_REGISTRY_BASE)
             typer.echo("Querying registry...")
