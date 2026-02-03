@@ -1,3 +1,4 @@
+# Canonical public MRP registry host (once deployed)
 MRP_DEFAULT_REGISTRY_BASE = "https://www.moltrouter.dev"
 
 # Fallback registry source (raw JSON list) when registry API is unavailable.
