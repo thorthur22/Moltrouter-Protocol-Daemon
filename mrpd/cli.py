@@ -27,9 +27,10 @@ def serve_cmd(
 @app.command(name="validate")
 def validate_cmd(
     path: str = typer.Option("-", "--path", help="JSON file path or '-' for stdin"),
+    fixtures: bool = typer.Option(False, "--fixtures", help="Validate bundled fixtures (valid must pass, invalid must fail)"),
 ) -> None:
     """Validate an MRP envelope against the bundled JSON Schemas."""
-    validate(path)
+    validate(path, fixtures=fixtures)
 
 
 if __name__ == "__main__":
