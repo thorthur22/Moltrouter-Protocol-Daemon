@@ -69,7 +69,10 @@ class RegistryClient:
             return RegistryQueryResponse(results=entries)
 
     async def _fetch_raw_entries(self) -> list[RegistryEntry]:
-        raw_url = os.getenv("MRP_BOOTSTRAP_REGISTRY_RAW", MRP_BOOTSTRAP_REGISTRY_RAW)
+        raw_url = os.getenv("MRP_BOOTSTRAP_REGISTRY_RAW") or MRP_BOOTSTRAP_REGISTRY_RAW
+        if not raw_url:
+            # No bootstrap configured; callers should rely on the hosted registry API.
+            return []
 
         if raw_url.startswith("file://"):
             path = raw_url[len("file://") :]
