@@ -3,7 +3,8 @@
 One installable package that can:
 - **serve** MRP endpoints for local tools (`mrpd serve`)
 - **route** intents as a client (`mrpd route ...`) (v0: registry query + ranking)
-- **bridge** other tool ecosystems (MCP/REST) into MRP (`mrpd bridge ...`) (planned)
+- **bridge** other tool ecosystems (OpenAPI/MCP) into MRP (`mrpd bridge ...`)
+- **mrpify** existing systems with a guided flow (`mrpd mrpify ...`)
 - **validate** MRP envelopes against schemas/fixtures (`mrpd validate`) (working)
 
 ## Status
@@ -13,10 +14,12 @@ Implemented:
 - Bundled canonical JSON Schemas + fixtures
 - `mrpd validate` (including `--fixtures`)
 - `mrpd route` (v0: query + rank + fetch manifests)
+- `mrpd bridge openapi` + `mrpd mrpify openapi`
+- `mrpd bridge mcp` (scaffold) + `mrpd mrpify mcp`
 
 Planned next:
 - negotiate/execute
-- MCP bridge adapter
+- MCP bridge execute (stdio)
 
 ## Dev
 ```bash
@@ -25,6 +28,21 @@ python -m venv .venv
 pip install -e .
 
 mrpd serve --reload
+```
+
+## Bridge / Mrpify (v0)
+OpenAPI:
+```bash
+mrpd bridge openapi --spec openapi.yaml --out-dir ./mrp-openapi-bridge
+mrpd mrpify openapi --spec openapi.yaml --out-dir ./mrp-openapi-bridge \
+  --provider-id service:openapi/bridge --public-base-url https://YOUR_DOMAIN
+```
+
+MCP (stdio scaffold):
+```bash
+mrpd bridge mcp --tools-json tools.json --mcp-command node --mcp-arg server.js
+mrpd mrpify mcp --tools-json tools.json --mcp-command node --mcp-arg server.js \
+  --provider-id service:mcp/bridge --public-base-url https://YOUR_DOMAIN
 ```
 
 ## Validate

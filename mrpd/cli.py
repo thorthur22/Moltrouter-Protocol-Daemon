@@ -5,6 +5,7 @@ import typer
 from mrpd.commands.bridge_mcp import bridge_mcp
 from mrpd.commands.bridge_openapi import bridge_openapi
 from mrpd.commands.init_provider import init_provider
+from mrpd.commands.mrpify_mcp import mrpify_mcp
 from mrpd.commands.mrpify_openapi import mrpify_openapi
 from mrpd.commands.publish import publish
 from mrpd.commands.route import route
@@ -114,9 +115,11 @@ def bridge_mcp_cmd(
     tools_json: str = typer.Option(..., "--tools-json", help="Path to MCP tools list JSON"),
     out_dir: str = typer.Option("./mrp-mcp-bridge", "--out-dir", help="Output directory"),
     provider_id: str = typer.Option("service:mcp/bridge", "--provider-id", help="Provider sender id"),
+    mcp_command: str = typer.Option(..., "--mcp-command", help="MCP server command (stdio)"),
+    mcp_args: list[str] = typer.Option([], "--mcp-arg", help="MCP server argument (repeatable)"),
 ) -> None:
     """Generate an MRP provider wrapper scaffold from an MCP tool list."""
-    bridge_mcp(tools_json=tools_json, out_dir=out_dir, provider_id=provider_id)
+    bridge_mcp(tools_json=tools_json, out_dir=out_dir, provider_id=provider_id, mcp_command=mcp_command, mcp_args=mcp_args)
 
 
 @mrpify_app.command(name="openapi")
@@ -139,6 +142,34 @@ def mrpify_openapi_cmd(
         provider_id=provider_id,
         backend_base_url=backend_base_url,
         capability_prefix=capability_prefix,
+        public_base_url=public_base_url,
+        do_publish=publish_now,
+        yes=yes,
+        registry=registry,
+        poll_seconds=poll_seconds,
+    )
+
+
+@mrpify_app.command(name="mcp")
+def mrpify_mcp_cmd(
+    tools_json: str = typer.Option(..., "--tools-json", help="Path to MCP tools list JSON"),
+    out_dir: str = typer.Option("./mrp-mcp-bridge", "--out-dir", help="Output directory"),
+    provider_id: str = typer.Option("service:mcp/bridge", "--provider-id", help="Provider sender id"),
+    mcp_command: str = typer.Option(..., "--mcp-command", help="MCP server command (stdio)"),
+    mcp_args: list[str] = typer.Option([], "--mcp-arg", help="MCP server argument (repeatable)"),
+    public_base_url: str | None = typer.Option(None, "--public-base-url", help="Deployed public base URL, e.g. https://api.example.com"),
+    publish_now: bool = typer.Option(False, "--publish", help="Run mrpd publish for each generated manifest URL (requires public HTTPS)"),
+    yes: bool = typer.Option(False, "--yes", help="Skip confirmation prompts"),
+    registry: str | None = typer.Option(None, "--registry", help="Registry base URL (default: https://www.moltrouter.dev)"),
+    poll_seconds: float = typer.Option(5.0, "--poll-seconds", min=1.0, max=60.0),
+) -> None:
+    """Guided flow: MCP -> MRP bridge -> (optional) publish commands."""
+    mrpify_mcp(
+        tools_json=tools_json,
+        out_dir=out_dir,
+        provider_id=provider_id,
+        mcp_command=mcp_command,
+        mcp_args=mcp_args,
         public_base_url=public_base_url,
         do_publish=publish_now,
         yes=yes,
