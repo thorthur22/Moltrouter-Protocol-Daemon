@@ -1,14 +1,34 @@
 from __future__ import annotations
 
 import json
+import os
 from typing import Optional
+from urllib.parse import urlparse
 
 import httpx
 
-import os
-
 from mrpd.core.defaults import MRP_BOOTSTRAP_REGISTRY_RAW, MRP_DEFAULT_REGISTRY_BASE
 from mrpd.core.models import RegistryEntry, RegistryQueryResponse
+
+
+def normalize_manifest_endpoints(manifest: dict, manifest_url: str) -> dict:
+    """Ensure manifest.endpoints contain absolute URLs.
+
+    If endpoints are relative ("/mrp/execute"), prefix with the origin of manifest_url.
+    """
+
+    out = dict(manifest)
+    endpoints = dict(out.get("endpoints") or {})
+
+    parsed = urlparse(manifest_url)
+    origin = f"{parsed.scheme}://{parsed.netloc}" if parsed.scheme and parsed.netloc else ""
+
+    for k, v in list(endpoints.items()):
+        if isinstance(v, str) and v.startswith("/") and origin:
+            endpoints[k] = origin + v
+
+    out["endpoints"] = endpoints
+    return out
 
 
 class RegistryClient:
@@ -41,7 +61,6 @@ class RegistryClient:
                 r.raise_for_status()
                 return RegistryQueryResponse.model_validate(r.json())
         except Exception:
-            # Fallback: raw JSON list (bootstrap)
             entries = await self._fetch_raw_entries()
             if capability:
                 entries = [e for e in entries if capability in e.capabilities]
@@ -69,12 +88,10 @@ class RegistryClient:
 
         entries: list[RegistryEntry] = []
         for item in payload:
-            # Require manifest_url (per user direction)
             if not isinstance(item, dict) or not item.get("manifest_url"):
                 continue
             entries.append(RegistryEntry.model_validate(item))
 
-        # de-dupe by id
         dedup: dict[str, RegistryEntry] = {}
         for e in entries:
             if e.id not in dedup:
@@ -83,25 +100,11 @@ class RegistryClient:
 
 
 async def fetch_manifest(manifest_url: str, timeout: float = 10.0) -> dict:
-    # Local development helpers
     if manifest_url.startswith("file://"):
         path = manifest_url[len("file://") :]
         if len(path) >= 3 and path[0] == "/" and path[2] == ":":
             path = path[1:]
         return json.loads(open(path, "r", encoding="utf-8").read())
-
-    # If the registry points at raw GitHub content for thorthur22/moltrouter,
-    # try to resolve to a local checkout during development.
-    prefix = "https://raw.githubusercontent.com/thorthur22/moltrouter/main/"
-    if manifest_url.startswith(prefix):
-        import os
-        from pathlib import Path
-
-        local_root = Path(os.getenv("MRP_DEV_MOLTROUTER_DIR", r"C:\Users\thort\Documents\moltrouter"))
-        rel = manifest_url[len(prefix) :].replace("/", os.sep)
-        candidate = local_root / rel
-        if candidate.exists():
-            return json.loads(candidate.read_text(encoding="utf-8"))
 
     async with httpx.AsyncClient(timeout=timeout, follow_redirects=False) as client:
         r = await client.get(manifest_url, headers={"Accept": "application/mrp-manifest+json, application/json"})

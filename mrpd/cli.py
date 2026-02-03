@@ -3,6 +3,7 @@ from __future__ import annotations
 import typer
 
 from mrpd.commands.route import route
+from mrpd.commands.run import run
 from mrpd.commands.serve import serve
 from mrpd.commands.validate import validate
 
@@ -45,6 +46,21 @@ def route_cmd(
 ) -> None:
     """Query registry + rank candidates for an intent."""
     route(intent=intent, capability=capability, policy=policy, registry=registry, limit=limit, bootstrap_raw=bootstrap_raw)
+
+
+@app.command(name="run")
+def run_cmd(
+    intent: str = typer.Argument(..., help="High-level intent (human text)"),
+    url: str = typer.Option(..., "--url", help="URL input"),
+    capability: str = typer.Option("summarize_url", "--capability", help="Capability to request"),
+    policy: str | None = typer.Option(None, "--policy", help="Policy requirement"),
+    registry: str | None = typer.Option(None, "--registry", help="Registry base URL (default: https://www.moltrouter.dev)"),
+    manifest_url: str | None = typer.Option(None, "--manifest-url", help="Skip registry and use this provider manifest URL (useful for local testing)"),
+    max_tokens: int | None = typer.Option(None, "--max-tokens", help="Soft max context tokens (constraint hint)"),
+    max_cost: float | None = typer.Option(None, "--max-cost", help="Max cost (constraint hint)"),
+) -> None:
+    """End-to-end: DISCOVER→EXECUTE against the best matching provider."""
+    run(intent=intent, url=url, capability=capability, policy=policy, registry=registry, manifest_url=manifest_url, max_tokens=max_tokens, max_cost=max_cost)
 
 
 if __name__ == "__main__":
