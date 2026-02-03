@@ -1,0 +1,16 @@
+{
+  "name": "mrpd",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Node wrapper for the MRPd (Moltrouter Protocol Daemon) CLI",
+  "license": "MIT",
+  "bin": {
+    "mrpd": "./bin/mrpd.js"
+  },
+  "files": [
+    "bin/mrpd.js"
+  ],
+  "engines": {
+    "node": ">=18"
+  }
+}
