@@ -8,6 +8,8 @@ def mrp_error(
     *,
     msg_id: str | None,
     timestamp: str | None,
+    receiver_id: str | None = None,
+    in_reply_to: str | None = None,
     code: str,
     message: str,
     retryable: bool = False,
@@ -20,7 +22,7 @@ def mrp_error(
     if details is not None:
         payload["details"] = details
 
-    return {
+    env = {
         "mrp_version": "0.1",
         "msg_id": msg_id,
         "msg_type": "ERROR",
@@ -28,3 +30,8 @@ def mrp_error(
         "sender": {"id": "service:mrpd"},
         "payload": payload,
     }
+    if receiver_id:
+        env["receiver"] = {"id": receiver_id}
+    if in_reply_to:
+        env["in_reply_to"] = in_reply_to
+    return env

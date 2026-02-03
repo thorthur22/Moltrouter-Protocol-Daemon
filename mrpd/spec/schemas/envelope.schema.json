@@ -39,6 +39,7 @@
       "required": ["id"],
       "properties": {"id": {"type": "string", "minLength": 3}}
     },
+    "in_reply_to": {"type": "string", "minLength": 8},
     "trace": {
       "type": "object",
       "additionalProperties": false,
