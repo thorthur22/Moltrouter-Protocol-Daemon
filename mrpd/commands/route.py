@@ -59,7 +59,17 @@ def route(
                 return 1
 
         if not entries:
-            typer.echo("No registry entries matched (and entries must include manifest_url).")
+            typer.echo("No registry entries matched.")
+            return 1
+
+        # Registry may return mixed results. Only entries with manifest_url are routable.
+        leads = [e for e in entries if not getattr(e, "manifest_url", None)]
+        entries = [e for e in entries if getattr(e, "manifest_url", None)]
+
+        if not entries:
+            typer.echo("No routable providers found (no entries with manifest_url).")
+            if leads:
+                typer.echo(f"Indexed leads found: {len(leads)} (not MRP providers yet).")
             return 1
 
         ranked = rank_entries(entries, capability=capability, policy=policy)
@@ -120,6 +130,19 @@ def route(
                 if r.entry.repo:
                     typer.echo(f"  repo: {r.entry.repo}")
                 typer.echo("")
+
+        if leads:
+            typer.echo("Indexed leads (not MRP providers yet):")
+            for e in leads[: min(limit, 20)]:
+                url = e.metadata.get("url") if isinstance(e.metadata, dict) else None
+                trust = getattr(e, "trust", None)
+                level = trust.level if trust and getattr(trust, "level", None) else None
+                typer.echo(f"- id={e.id} name={e.name} canonical_id={getattr(e,'canonical_id',None)}")
+                if level:
+                    typer.echo(f"  trust.level: {level}")
+                if url:
+                    typer.echo(f"  url: {url}")
+            typer.echo("")
 
         return 0
 

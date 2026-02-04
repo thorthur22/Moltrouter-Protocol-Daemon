@@ -5,7 +5,14 @@ from typing import Any, List, Literal, Optional
 from pydantic import BaseModel, Field
 
 
-VerificationLevel = Literal["self_asserted", "registry_attested", "third_party_audited"]
+VerificationLevel = Literal[
+    "self_asserted",
+    "registry_attested",
+    "third_party_indexed",
+    "third_party_audited",
+]
+
+RegistryEntryKind = Literal["provider", "indexed"]
 
 
 class TrustInfo(BaseModel):
@@ -16,11 +23,19 @@ class TrustInfo(BaseModel):
 
 class RegistryEntry(BaseModel):
     id: str
+
+    # Stable identity used to merge indexed/provider records.
+    canonical_id: Optional[str] = None
+
+    kind: Optional[RegistryEntryKind] = None
+
     name: str
     description: Optional[str] = None
 
     repo: Optional[str] = None
-    manifest_url: str
+
+    # Required for kind=provider; optional for kind=indexed.
+    manifest_url: Optional[str] = None
 
     capabilities: List[str] = Field(default_factory=list)
     policies: List[str] = Field(default_factory=list)
