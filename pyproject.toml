@@ -2,9 +2,13 @@
 name = "mrpd"
 version = "0.1.1"
 description = "Moltrouter Protocol Daemon: serve, route, bridge, validate"
+
+classifiers = [
+  "License :: OSI Approved :: Apache Software License",
+]
 readme = "README.md"
 requires-python = ">=3.10"
-license = {text = "MIT"}
+license = {text = "Apache-2.0"}
 authors = [{name = "Thor"}]
 dependencies = [
   "fastapi>=0.110",

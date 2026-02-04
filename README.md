@@ -1,5 +1,7 @@
 # mrpd — Moltrouter Protocol Daemon
 
+**License:** Apache-2.0
+
 One installable package that can:
 - **serve** MRP endpoints for local tools (`mrpd serve`)
 - **route** intents as a client (`mrpd route ...`) (v0: registry query + ranking)
