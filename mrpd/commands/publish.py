@@ -74,6 +74,27 @@ def publish(
             typer.echo(expected)
             typer.echo("")
             typer.echo("When ready, I will verify and publish the entry.")
+            typer.echo("")
+            typer.echo("Notes:")
+            typer.echo("- The challenge URL must return ONLY the expected string above (raw text).")
+            typer.echo("- No JSON. No quotes. Avoid a trailing newline if you can.")
+            typer.echo("- Re-running publish generates a NEW token. Old tokens won't verify.")
+
+            async def _debug_fetch_challenge(challenge_url: str) -> None:
+                try:
+                    fr = await client.get(
+                        challenge_url,
+                        headers={"Accept": "text/plain", "User-Agent": "mrpd/0.1"},
+                    )
+                    body = fr.text
+                    preview = body.replace("\n", "\\n")
+                    if len(preview) > 200:
+                        preview = preview[:200] + "…"
+                    typer.echo(
+                        f"  debug: GET {challenge_url} -> {fr.status_code}, len={len(body)} body='{preview}'"
+                    )
+                except Exception as e:
+                    typer.echo(f"  debug: GET {challenge_url} failed: {e}")
 
             # Poll verify
             while True:
@@ -96,6 +117,17 @@ def publish(
 
                 err = out.get("error") or out.get("message") or vr.text
                 typer.echo(f"Waiting… ({err})")
+
+                # Improve debugging for the most common failure modes.
+                if isinstance(out, dict):
+                    ch_url = out.get("challenge_url") or out.get("challengeUrl")
+                    got = out.get("got")
+                    exp = out.get("expected")
+                    if ch_url and (err in ("challenge_not_found", "challenge_mismatch") or got or exp):
+                        if exp and got:
+                            typer.echo(f"  expected: {str(exp)[:200]}")
+                            typer.echo(f"  got     : {str(got)[:200]}")
+                        await _debug_fetch_challenge(str(ch_url))
 
                 await asyncio.sleep(poll_seconds)
 
